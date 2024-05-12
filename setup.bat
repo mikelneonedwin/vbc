@@ -13,7 +13,7 @@ if not exist "%parent_net%" (
 if not exist "%~dp0\dot.bat" echo Cannot find vbc.bat && goto :exit
 if not exist "%userprofile%\vbc" mkdir "%userprofile%\vbc"
 copy "%~dp0\dot.bat" "%userprofile%\vbc\vbc.bat" > NUL
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%userprofile%\vbc" /f || echo Please run as administrator && goto :exit
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%userprofile%\vbc" /f || echo Please run as administrator && cscript main.js && goto :exit
 :success
 echo Visual Basic Compiler succesfully setup. Run vbc to confirm
 echo Your PC will sign out to complete installation
