@@ -10,7 +10,7 @@
 4. Use the "vbc" command from any location within the command prompt or any scripting environment to compile and execute Visual Basic code.
 
 ## Important Notes:
-- Do not exit any of the scrip files (setup.bat, vbc.bat) as it may disrupt their functionality.
+- Do not exit any of the script files as it may disrupt their functionality and cause potential damage to your device.
 - Ensure that you have the necessary permissions to run scripts as an administrator
 - For any assistance or inquires, feel free to contact the developer at [+2348076488738](tel:+2348076488738) or on [WhatsApp](https://wa.me/2348076488738)
 
