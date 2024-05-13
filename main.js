@@ -1,7 +1,6 @@
 var sourceFile = "info.json"
 var shell = new ActiveXObject("WScript.Shell");
 var destinationFile = shell.ExpandEnvironmentStrings("%appdata%") + "\\Code\\User\\tasks.json"
-WScript.Echo(destinationFile);
 var fso = new ActiveXObject("Scripting.FileSystemObject");
 var json2 = fso.OpenTextFile("json2.js", 1)
 eval(json2.ReadAll())

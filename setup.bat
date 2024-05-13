@@ -10,10 +10,21 @@ if not exist "%parent_net%" (
     echo It seems you do not have the .NET Framework installed
     goto :exit
 )
+set "regex_pattern=v[0-9]."
+set "last_framework_version="
+for /f "delims=" %%i in ('dir /b /ad %parent_net% ^| findstr /R "^v[0-9]" ^| sort /r') do (
+    set "last_framework_version=%%i"
+    goto :done
+)
+:done
+setx vbc_compiler_exe "%parent_net%\%last_framework_version%\vbc.exe"
 if not exist "%~dp0\dot.bat" echo Cannot find vbc.bat && goto :exit
 if not exist "%userprofile%\vbc" mkdir "%userprofile%\vbc"
 copy "%~dp0\dot.bat" "%userprofile%\vbc\vbc.bat" > NUL
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%userprofile%\vbc" /f || echo Please run as administrator && cscript main.js && goto :exit
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%userprofile%\vbc" /f && cscript main.js || (
+    echo Please run as administrator
+    goto :exit
+)
 :success
 echo Visual Basic Compiler succesfully setup. Run vbc to confirm
 echo Your PC will sign out to complete installation
