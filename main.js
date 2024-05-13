@@ -1,76 +1,76 @@
-var sourceFile = "info.json"
 var shell = new ActiveXObject("WScript.Shell");
-var destinationFile = shell.ExpandEnvironmentStrings("%appdata%") + "\\Code\\User\\tasks.json"
 var fso = new ActiveXObject("Scripting.FileSystemObject");
+
+// enable JSON
 var json2 = fso.OpenTextFile("json2.js", 1)
 eval(json2.ReadAll())
 json2.close();
-var sourceJson;
-try {
-    var sourceFileStream = fso.OpenTextFile(sourceFile, 1);
-    sourceJson = sourceFileStream.ReadAll();
+
+
+function getJSON(path, def) {
+    var sourceFileStream = fso.OpenTextFile(path, 1);
+    var sourceJSON = sourceFileStream.ReadAll();
     sourceFileStream.close();
-} catch (e) {
-    WScript.Echo("Error reading source JSON File: " + e.message);
-    WScript.Quit(1);
+    try {
+        return JSON.parse(sourceJSON);
+    } catch (e) {
+        if (def) return def;
+        else throw e
+    }
 }
-var destinationJson;
-try {
-    var destinationFileStream = fso.OpenTextFile(destinationFile, 1);
-    destinationJson = destinationFileStream.ReadAll();
-    destinationFileStream.close();
-} catch (e) {
-    destinationJson = JSON.stringify({
-        version: "2.0.0"
-    })
-}
-var sourceObj;
-var destinationObj;
-try {
-    sourceObj = JSON.parse(sourceJson);
-    destinationObj = JSON.parse(destinationJson);
-} catch (e) {
-    WScript.Echo("Error parsing JSON: " + e.message);
-    WScript.Quit(1)
-}
-if (!sourceObj.hasOwnProperty("tasks")) {
-    WScript.Echo("Source JSON does not have a tasks property.")
-    WScript.Quit(1)
-}
-if (!destinationObj.hasOwnProperty("tasks")) {
-    destinationObj.tasks = []
-}
-destinationObj.tasks = destinationObj.tasks.concat(sourceObj.tasks);
-var destinationJsonString = JSON.stringify(destinationObj);
-try {
-    var outFile = fso.CreateTextFile(destinationFile, true);
-    outFile.WriteLine(destinationJsonString);
+
+function saveJSON(path, data) {
+    var outFile = fso.CreateTextFile(path, true);
+    outFile.WriteLine(JSON.stringify(data));
     outFile.close();
-    WScript.Echo("VS Code Tasks appended successfully")
-} catch (e) {
-    WScript.Echo("Error appending VS Code tasks: " + e.message);
-    WScript.Quit(1)
 }
-destinationFile = shell.ExpandEnvironmentStrings("%appdata%") + "\\Code\\User\\keybindings.json"
-destinationJson = "[]";
-try {
-    var destinationFileStream = fso.OpenTextFile(destinationFile, 1);
-    destinationJson = destinationFileStream.ReadAll();
-    destinationFileStream.close();
-} catch (e) { }
-try {
-    destinationObj = JSON.parse(destinationJson);
-} catch (e) {
-    destinationObj = [];
+
+
+// enable console
+var console = {
+    log: function (t) {
+        WScript.Echo(t)
+    }
 }
-destinationObj.push(sourceObj.key);
-destinationJsonString = JSON.stringify(destinationObj);
-try {
-    var outFile = fso.CreateTextFile(destinationFile, true);
-    outFile.WriteLine(destinationJsonString);
-    outFile.close();
-    WScript.Echo("VS Code key bindings appended successfully");
-} catch (e) {
-    WScript.Echo("Error appending VS Code key bindings: " + e.message)
-    WScript.Quit(1);
+
+// read from source json
+var source = getJSON("info.json");
+
+{
+    var taskPath = shell.ExpandEnvironmentStrings("%appdata%") + "\\Code\\User\\tasks.json";
+    var tasks = getJSON(taskPath, {});
+    var hasTask = false;
+    // set tasks property
+    tasks.tasks || (tasks.tasks = []);
+    // set version
+    tasks.version || (tasks.version = "2.0.0");
+    if (tasks.tasks.length) {
+        for (var i = 0; i < tasks.tasks.length; i++) {
+            tasks.tasks[i].label === "VBC" &&
+                (hasTask = i)
+        }
+    }
+    hasTask === false && (hasTask = tasks.tasks.length);
+    tasks.tasks[hasTask] = source.task;
+    saveJSON(taskPath, tasks);
+    console.log("Modified VS Code Tasks successfully");
 }
+
+{
+    var keyPath = shell.ExpandEnvironmentStrings("%appdata%") + "\\Code\\User\\keybindings.json";
+    var keys = getJSON(keyPath, []);
+    var hasKey = false;
+    if (keys.length) {
+        for (var i = 0; i < keys.length; i++) {
+            keys[i].key == "f5" &&
+                keys[i].command == "workbench.action.tasks.runTask" &&
+                typeof keys[i].args == "object" &&
+                keys[i].args.task == "VBC" &&
+                (hasKey = i);
+            }
+        }
+        hasKey === false && (hasKey = keys.length);
+        keys[hasKey] = source.key;
+        saveJSON(keyPath, keys);
+        console.log("Modified VS Code Key bindings successfully");
+    }
