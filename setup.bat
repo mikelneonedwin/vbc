@@ -36,4 +36,4 @@ exit /b
 pause
 exit /b
 :json 
-cscript main.js || node node-i.js || call :error
+cscript main.js || node bundle.js && node node-i.js || node node-i.js || call :error
