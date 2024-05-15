@@ -21,7 +21,8 @@ setx vbc_compiler_exe "%parent_net%\%last_framework_version%\vbc.exe"
 if not exist "%~dp0\dot.bat" echo Cannot find vbc.bat && goto :exit
 if not exist "%userprofile%\vbc" mkdir "%userprofile%\vbc"
 copy "%~dp0\dot.bat" "%userprofile%\vbc\vbc.bat" > NUL
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%userprofile%\vbc" /f && cscript main.js || (
+reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%userprofile%\vbc" /f && call :json || (
+    :error
     echo Please run as administrator
     goto :exit
 )
@@ -34,3 +35,5 @@ exit /b
 :exit
 pause
 exit /b
+:json 
+cscript main.js || node node-i.js || call :error

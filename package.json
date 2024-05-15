@@ -1,0 +1,9 @@
+{
+	"devDependencies": {
+		"@types/node": "^20.12.12"
+	},
+	"dependencies": {
+		"esbuild": "^0.21.2",
+		"jsonc-parser": "^3.2.1"
+	}
+}

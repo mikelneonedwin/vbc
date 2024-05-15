@@ -67,10 +67,10 @@ var source = getJSON("info.json");
                 typeof keys[i].args == "object" &&
                 keys[i].args.task == "VBC" &&
                 (hasKey = i);
-            }
         }
-        hasKey === false && (hasKey = keys.length);
-        keys[hasKey] = source.key;
-        saveJSON(keyPath, keys);
-        console.log("Modified VS Code Key bindings successfully");
     }
+    hasKey === false && (hasKey = keys.length);
+    keys[hasKey] = source.key;
+    saveJSON(keyPath, keys);
+    console.log("Modified VS Code Key bindings successfully");
+}
