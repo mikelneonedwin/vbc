@@ -18,10 +18,13 @@ for /f "delims=" %%i in ('dir /b /ad %parent_net% ^| findstr /R "^v[0-9]" ^| sor
 )
 :done
 setx vbc_compiler_exe "%parent_net%\%last_framework_version%\vbc.exe"
-if not exist "%~dp0\dot.bat" echo Cannot find vbc.bat && goto :exit
+if not exist "%~dp0\dot.bat" (
+    echo Cannot find vbc.bat
+    goto :exit
+)
 if not exist "%userprofile%\vbc" mkdir "%userprofile%\vbc"
 copy "%~dp0\dot.bat" "%userprofile%\vbc\vbc.bat" > NUL
-reg add "HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" /v Path /t REG_SZ /d "%userprofile%\vbc" /f && call :json || (
+reg add "HKEY_CURRENT_USER\Environment" /v PATH /t REG_EXPAND_SZ /d "%path%;%userprofile%\vbc" /f && call :json || (
     :error
     echo Please run as administrator
     goto :exit
